@@ -1,0 +1,71 @@
+# Gradle build output and local caches
+.gradle/
+build/
+
+# Java compiler and packaged artifacts
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# Keep the Gradle Wrapper executable dependency in version control
+!gradle/wrapper/gradle-wrapper.jar
+
+# Local Spring Boot configuration and secrets
+.env
+.env.*
+!.env.example
+application-local.properties
+application-local.yml
+application-local.yaml
+application-secret.properties
+application-secret.properties
+application-secret.yml
+application-secret.yaml
+
+# Local runtime data
+/uploads/
+/tmp/
+
+# Eclipse / Spring Tools Suite
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated Spring Initializr documentation
+HELP.md
+
+# Local agent guidance and Codex workspace data
+AGENTS.md
+.codex/
