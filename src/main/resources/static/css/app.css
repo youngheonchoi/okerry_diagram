@@ -96,6 +96,27 @@ button:disabled {
     font-size: 14px;
 }
 
+.controller-results {
+    margin-top: 20px;
+}
+
+.controller-results h2,
+.controller-results h3 {
+    margin-top: 0;
+}
+
+.controller-results h3 {
+    margin: 20px 0 8px;
+    font-size: 16px;
+}
+
+.controller-results ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #5d6779;
+    line-height: 1.8;
+}
+
 @media (max-width: 560px) {
     .page-shell {
         padding: 64px 0;

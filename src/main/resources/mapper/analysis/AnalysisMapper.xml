@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.okerry.okerry_diagram.analysis.mapper.AnalysisMapper">
+    <insert id="insertSourceClass" parameterType="map" useGeneratedKeys="true" keyProperty="classId">
+        INSERT INTO source_classes (project_id, package_name, class_name, qualified_name, component_type, file_path)
+        VALUES (#{projectId}, #{packageName}, #{className}, #{qualifiedName}, #{componentType}, #{filePath})
+    </insert>
+
+    <insert id="insertSourceMethod" parameterType="map" useGeneratedKeys="true" keyProperty="methodId">
+        INSERT INTO source_methods (class_id, method_name, http_method, request_path)
+        VALUES (#{classId}, #{methodName}, #{httpMethod}, #{requestPath})
+    </insert>
+</mapper>

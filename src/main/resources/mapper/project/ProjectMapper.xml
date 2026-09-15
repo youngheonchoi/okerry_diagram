@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.okerry.okerry_diagram.project.mapper.ProjectMapper">
+    <insert id="insertProject" parameterType="map" useGeneratedKeys="true" keyProperty="projectId">
+        INSERT INTO projects (name, repository_url, status, analyzed_at)
+        VALUES (#{name}, #{repositoryUrl}, #{status}, CURRENT_TIMESTAMP)
+    </insert>
+
+    <select id="selectProject" parameterType="map" resultType="map">
+        SELECT id, name, repository_url AS "repositoryUrl", status, created_at AS "createdAt", analyzed_at AS "analyzedAt"
+        FROM projects WHERE id = #{projectId}
+    </select>
+
+    <select id="selectControllerList" parameterType="map" resultType="map">
+        SELECT sc.id AS "classId", sc.class_name AS "className", sm.id AS "methodId",
+               sm.http_method AS "httpMethod", sm.request_path AS "requestPath", sm.method_name AS "methodName"
+        FROM source_classes sc
+        JOIN source_methods sm ON sm.class_id = sc.id
+        WHERE sc.project_id = #{projectId} AND sc.component_type = 'CONTROLLER'
+        ORDER BY sc.class_name, sm.request_path, sm.method_name
+    </select>
+</mapper>

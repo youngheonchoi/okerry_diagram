@@ -24,9 +24,7 @@ public class RepositoryCloneController {
     @PostMapping("/api/projects/analyze")
     public Map<String, Object> analyze(@RequestBody Map<String, Object> param) {
         Object repositoryUrl = param.get("repositoryUrl");
-        repositoryCloneService.verifyClone(repositoryUrl instanceof String value ? value : null);
-
-        return Map.of("status", "CLONED");
+        return repositoryCloneService.analyze(repositoryUrl instanceof String value ? value : null);
     }
 
     @ExceptionHandler(InvalidRepositoryUrlException.class)
