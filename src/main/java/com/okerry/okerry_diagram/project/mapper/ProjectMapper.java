@@ -11,4 +11,6 @@ public interface ProjectMapper {
 
     List<Map<String, Object>> selectControllerList(Map<String, Object> param);
 
+    List<Map<String, Object>> selectClassMethodList(Map<String, Object> param);
+
 }

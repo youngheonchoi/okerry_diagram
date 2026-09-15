@@ -37,4 +37,26 @@ public class ProjectService {
         return new ArrayList<>(controllers.values());
     }
 
+    public List<Map<String, Object>> classes(long projectId) {
+        List<Map<String, Object>> rows = projectMapper.selectClassMethodList(Map.of("projectId", projectId));
+        Map<Object, Map<String, Object>> classes = new LinkedHashMap<>();
+
+        for (Map<String, Object> row : rows) {
+            Map<String, Object> sourceClass = classes.computeIfAbsent(row.get("classId"), key -> {
+                Map<String, Object> value = new LinkedHashMap<>();
+                value.put("classId", row.get("classId"));
+                value.put("className", row.get("className"));
+                value.put("componentType", row.get("componentType"));
+                value.put("methods", new ArrayList<Map<String, Object>>());
+                return value;
+            });
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> methods = (List<Map<String, Object>>) sourceClass.get("methods");
+            methods.add(Map.of("methodId", row.get("methodId"), "methodName", row.get("methodName"),
+                    "signature", row.get("signature"), "returnType", row.get("returnType"),
+                    "startLine", row.get("startLine"), "endLine", row.get("endLine")));
+        }
+        return new ArrayList<>(classes.values());
+    }
+
 }

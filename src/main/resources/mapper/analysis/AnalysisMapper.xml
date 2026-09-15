@@ -7,7 +7,10 @@
     </insert>
 
     <insert id="insertSourceMethod" parameterType="map" useGeneratedKeys="true" keyProperty="methodId">
-        INSERT INTO source_methods (class_id, method_name, http_method, request_path)
-        VALUES (#{classId}, #{methodName}, #{httpMethod}, #{requestPath})
+        INSERT INTO source_methods (
+            class_id, method_name, signature, return_type, start_line, end_line, source_code, http_method, request_path
+        ) VALUES (
+            #{classId}, #{methodName}, #{signature}, #{returnType}, #{startLine}, #{endLine}, #{sourceCode}, #{httpMethod}, #{requestPath}
+        )
     </insert>
 </mapper>

@@ -22,4 +22,9 @@ public class ProjectController {
         return projectService.controllers(projectId);
     }
 
+    @GetMapping("/api/projects/{projectId}/classes")
+    public List<Map<String, Object>> classes(@PathVariable long projectId) {
+        return projectService.classes(projectId);
+    }
+
 }

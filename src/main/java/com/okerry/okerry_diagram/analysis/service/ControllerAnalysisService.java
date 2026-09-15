@@ -42,6 +42,7 @@ public class ControllerAnalysisService {
         projectMapper.insertProject(project);
 
         long projectId = ((Number) project.get("projectId")).longValue();
+        int classCount = 0;
         int controllerCount = 0;
         int apiCount = 0;
 
@@ -51,35 +52,40 @@ public class ControllerAnalysisService {
                 String packageName = unit.getPackageDeclaration().map(value -> value.getNameAsString()).orElse("");
 
                 for (ClassOrInterfaceDeclaration type : unit.findAll(ClassOrInterfaceDeclaration.class)) {
-                    if (!isController(type)) {
-                        continue;
-                    }
-
                     Map<String, Object> sourceClass = new HashMap<>();
                     sourceClass.put("projectId", projectId);
                     sourceClass.put("packageName", packageName);
                     sourceClass.put("className", type.getNameAsString());
                     sourceClass.put("qualifiedName", packageName.isBlank() ? type.getNameAsString() : packageName + "." + type.getNameAsString());
-                    sourceClass.put("componentType", "CONTROLLER");
+                    String componentType = componentType(type);
+                    sourceClass.put("componentType", componentType);
                     sourceClass.put("filePath", workspace.relativize(javaFile).toString());
                     analysisMapper.insertSourceClass(sourceClass);
-                    controllerCount++;
+                    classCount++;
+                    if (componentType.equals("CONTROLLER")) {
+                        controllerCount++;
+                    }
 
                     List<String> classPaths = mappingPaths(type.getAnnotations());
                     for (MethodDeclaration method : type.getMethods()) {
                         List<Mapping> mappings = methodMappings(method.getAnnotations());
-                        for (Mapping mapping : mappings) {
-                            for (String classPath : classPaths) {
-                                for (String methodPath : mapping.paths()) {
-                                    Map<String, Object> sourceMethod = new HashMap<>();
-                                    sourceMethod.put("classId", sourceClass.get("classId"));
-                                    sourceMethod.put("methodName", method.getNameAsString());
-                                    sourceMethod.put("httpMethod", mapping.httpMethod());
-                                    sourceMethod.put("requestPath", joinPaths(classPath, methodPath));
-                                    analysisMapper.insertSourceMethod(sourceMethod);
-                                    apiCount++;
-                                }
-                            }
+                        Mapping mapping = mappings.isEmpty() ? new Mapping(null, List.of("")) : mappings.get(0);
+                        String requestPath = componentType.equals("CONTROLLER")
+                                ? joinPaths(classPaths.get(0), mapping.paths().get(0)) : null;
+                        Map<String, Object> sourceMethod = new HashMap<>();
+                        sourceMethod.put("classId", sourceClass.get("classId"));
+                        sourceMethod.put("methodName", method.getNameAsString());
+                        sourceMethod.put("signature", methodSignature(packageName, type, method));
+                        sourceMethod.put("returnType", method.getTypeAsString());
+                        sourceMethod.put("startLine", method.getBegin().map(position -> position.line).orElse(0));
+                        sourceMethod.put("endLine", method.getEnd().map(position -> position.line).orElse(0));
+                        sourceMethod.put("sourceCode", method.toString());
+                        sourceMethod.put("httpMethod", mapping.httpMethod());
+                        sourceMethod.put("requestPath", requestPath);
+                        analysisMapper.insertSourceMethod(sourceMethod);
+
+                        if (componentType.equals("CONTROLLER") && !mappings.isEmpty()) {
+                            apiCount++;
                         }
                     }
                 }
@@ -88,7 +94,8 @@ public class ControllerAnalysisService {
             }
         }
 
-        return Map.of("projectId", projectId, "status", "COMPLETED", "controllerCount", controllerCount, "apiCount", apiCount);
+        return Map.of("projectId", projectId, "status", "COMPLETED", "classCount", classCount,
+                "controllerCount", controllerCount, "apiCount", apiCount);
     }
 
     private List<Path> findJavaFiles(Path workspace) {
@@ -101,9 +108,25 @@ public class ControllerAnalysisService {
         }
     }
 
-    private boolean isController(ClassOrInterfaceDeclaration type) {
-        return type.getAnnotations().stream().map(annotation -> simpleName(annotation.getNameAsString()))
-                .anyMatch(name -> name.equals("Controller") || name.equals("RestController"));
+    private String componentType(ClassOrInterfaceDeclaration type) {
+        List<String> annotationNames = type.getAnnotations().stream()
+                .map(annotation -> simpleName(annotation.getNameAsString())).toList();
+        if (annotationNames.contains("Controller") || annotationNames.contains("RestController")) {
+            return "CONTROLLER";
+        }
+        if (annotationNames.contains("Service")) {
+            return "SERVICE";
+        }
+        if (annotationNames.contains("Repository")) {
+            return "REPOSITORY";
+        }
+        if (annotationNames.contains("Mapper")) {
+            return "MAPPER";
+        }
+        if (annotationNames.contains("Component")) {
+            return "COMPONENT";
+        }
+        return "OTHER";
     }
 
     private List<String> mappingPaths(List<AnnotationExpr> annotations) {
@@ -164,6 +187,14 @@ public class ControllerAnalysisService {
     private String repositoryName(String repositoryUrl) {
         String value = repositoryUrl.substring(repositoryUrl.lastIndexOf('/') + 1);
         return value.endsWith(".git") ? value.substring(0, value.length() - 4) : value;
+    }
+
+    private String methodSignature(String packageName, ClassOrInterfaceDeclaration type, MethodDeclaration method) {
+        String parameters = method.getParameters().stream().map(parameter -> parameter.getTypeAsString())
+                .reduce((left, right) -> left + "," + right).orElse("");
+        String qualifiedClassName = packageName.isBlank() ? type.getNameAsString()
+                : packageName + "." + type.getNameAsString();
+        return qualifiedClassName + "#" + method.getNameAsString() + "(" + parameters + ")";
     }
 
     private String simpleName(String name) {

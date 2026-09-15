@@ -16,7 +16,17 @@
                sm.http_method AS "httpMethod", sm.request_path AS "requestPath", sm.method_name AS "methodName"
         FROM source_classes sc
         JOIN source_methods sm ON sm.class_id = sc.id
-        WHERE sc.project_id = #{projectId} AND sc.component_type = 'CONTROLLER'
+        WHERE sc.project_id = #{projectId} AND sc.component_type = 'CONTROLLER' AND sm.http_method IS NOT NULL
         ORDER BY sc.class_name, sm.request_path, sm.method_name
+    </select>
+
+    <select id="selectClassMethodList" parameterType="map" resultType="map">
+        SELECT sc.id AS "classId", sc.class_name AS "className", sc.component_type AS "componentType",
+               sm.id AS "methodId", sm.method_name AS "methodName", sm.signature AS "signature", sm.return_type AS "returnType",
+               sm.start_line AS "startLine", sm.end_line AS "endLine"
+        FROM source_classes sc
+        JOIN source_methods sm ON sm.class_id = sc.id
+        WHERE sc.project_id = #{projectId}
+        ORDER BY sc.class_name, sm.start_line
     </select>
 </mapper>

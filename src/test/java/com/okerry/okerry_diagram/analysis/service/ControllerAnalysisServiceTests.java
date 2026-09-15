@@ -48,16 +48,32 @@ class ControllerAnalysisServiceTests {
                     void insert() { }
                 }
                 """);
+        Files.writeString(sourceDirectory.resolve("UserService.java"), """
+                package com.example.user;
+
+                import org.springframework.stereotype.Service;
+
+                @Service
+                class UserService {
+                    String findById(Long id) { return "user"; }
+                }
+                """);
 
         Map<String, Object> result = controllerAnalysisService.analyze(
                 "https://github.com/example/sample.git", temporaryDirectory);
         List<Map<String, Object>> controllers = projectService.controllers(
                 ((Number) result.get("projectId")).longValue());
+        List<Map<String, Object>> classes = projectService.classes(
+                ((Number) result.get("projectId")).longValue());
 
+        assertEquals(2, result.get("classCount"));
         assertEquals(1, result.get("controllerCount"));
         assertEquals(2, result.get("apiCount"));
         assertEquals("UserController", controllers.get(0).get("className"));
         assertEquals(2, ((List<?>) controllers.get(0).get("apis")).size());
+        assertEquals(2, classes.size());
+        assertEquals("com.example.user.UserService#findById(Long)",
+                ((List<Map<String, Object>>) classes.get(1).get("methods")).get(0).get("signature"));
     }
 
 }
