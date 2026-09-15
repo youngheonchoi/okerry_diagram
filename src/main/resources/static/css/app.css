@@ -1,0 +1,111 @@
+:root {
+    color: #172033;
+    background: #f5f7fb;
+    font-family: Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.page-shell {
+    width: min(760px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 112px 0;
+}
+
+.intro {
+    margin-bottom: 40px;
+}
+
+.eyebrow {
+    margin: 0 0 12px;
+    color: #4665d9;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+h1 {
+    margin: 0;
+    font-size: clamp(32px, 6vw, 48px);
+    letter-spacing: -0.04em;
+}
+
+.description {
+    margin: 18px 0 0;
+    color: #5d6779;
+    font-size: 17px;
+    line-height: 1.65;
+}
+
+.analysis-card {
+    padding: 28px;
+    border: 1px solid #dfe4ee;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgb(24 39 75 / 6%);
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.repository-form {
+    display: flex;
+    gap: 10px;
+}
+
+input,
+button {
+    min-height: 46px;
+    border-radius: 8px;
+    font: inherit;
+}
+
+input {
+    width: 100%;
+    padding: 0 14px;
+    border: 1px solid #cfd6e4;
+    background: #f8f9fc;
+}
+
+button {
+    padding: 0 20px;
+    border: 0;
+    background: #4665d9;
+    color: #fff;
+    font-weight: 700;
+}
+
+input:disabled,
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.form-help {
+    margin: 12px 0 0;
+    color: #6b7485;
+    font-size: 14px;
+}
+
+@media (max-width: 560px) {
+    .page-shell {
+        padding: 64px 0;
+    }
+
+    .analysis-card {
+        padding: 22px;
+    }
+
+    .repository-form {
+        flex-direction: column;
+    }
+}
