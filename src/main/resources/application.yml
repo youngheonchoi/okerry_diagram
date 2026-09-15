@@ -10,3 +10,9 @@ mybatis:
   mapper-locations: classpath:/mapper/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
+
+spring-flow:
+  git:
+    clone-timeout-seconds: ${GIT_CLONE_TIMEOUT_SECONDS:60}
+  workspace:
+    root: ${WORKSPACE_ROOT:${java.io.tmpdir}/spring-flow/workspaces}
